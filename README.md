@@ -35,16 +35,16 @@ To get the best results, the input image matters as much as the model. Follow th
 
 **Recommended:**
 
-- ✅ A single object per image
-- ✅ Standard front view of the object
-- ✅ White, monochrome or removed background
+- A single object per image
+- Standard front view of the object
+- White, monochrome or removed background
 
 **Not recommended:**
 
-- ⚠️ Text on the image
-- ⚠️ Multiple objects in one image
-- ⚠️ Complex or cluttered background
-- ❌ Inappropriate imagery, including harmful, offensive or NSFW content
+- Text on the image
+- Multiple objects in one image
+- Complex or cluttered background
+- Inappropriate imagery, including harmful, offensive or NSFW content
 
 ---
 
@@ -127,7 +127,7 @@ TCC-PROJECT/
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
