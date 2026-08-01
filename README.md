@@ -6,7 +6,7 @@ Project focused on building a tool that converts 2D images into 3D models using 
 
 ## 1. Project Overview
 
-The goal of this project is to reconstruct 3D models from 2D images. The tool applies computer vision and machine learning techniques to infer depth and three-dimensional structure of objects from one or more images.
+The tool infers depth and three-dimensional structure of objects from one or more input images.
 
 ### Challenges
 
@@ -130,4 +130,3 @@ TCC-PROJECT/
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
