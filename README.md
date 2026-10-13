@@ -1,132 +1,83 @@
-# 3D Reconstruction from 2D Images
+<h1 align="center">3D Reconstruction from 2D Images</h1>
 
-Project focused on building a tool that converts 2D images into 3D models using computer vision and machine learning techniques.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/guavovic/3d-reconstruction-from-2d-images-public?style=flat-square&label=licen%C3%A7a&color=2ea043" alt="Licença"></a>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch">
+  <img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white" alt="OpenCV">
+</p>
 
----
+<p align="center">Ferramenta do meu TCC que transforma uma foto comum em um modelo 3D. Ela tira o fundo da imagem, estima a profundidade de cada pixel com inteligência artificial e monta a malha 3D a partir disso, pronta para abrir no Blender.</p>
 
-## 1. Project Overview
+> [!NOTE]
+> O código fica num repositório privado. Este repositório é a vitrine do projeto.
 
-The tool infers depth and three-dimensional structure of objects from one or more input images.
+<img src="docs/assets/forma-cristalina-girando.gif" alt="Forma 3D cristalina, verde e azul com brilho furta-cor, girando sobre fundo branco" width="100%">
 
-### Challenges
+<img src="docs/assets/forma-espiral-girando.gif" alt="Forma 3D em espiral, lilás e rosa com brilho furta-cor, girando sobre fundo branco" width="100%">
 
-- A single image does not carry complete information about depth and geometry.
-- 3D reconstruction requires advanced techniques to infer the three-dimensional structure from limited data.
+## Destaques
 
----
+- **Uma foto basta:** o modelo 3D sai de uma única imagem, sem precisar fotografar o objeto de vários ângulos.
+- **Profundidade por IA:** o MiDaS, rede neural treinada para estimar distância, diz o quanto cada pixel está perto ou longe.
+- **Fundo removido sozinho:** o objeto principal é separado do resto antes de virar 3D.
+- **Saída em `.obj`:** formato aberto que o Blender e outros programas de modelagem leem direto.
+- **Interface simples:** uma janela para escolher a imagem e gerar o modelo, com o andamento de cada etapa na tela.
 
-## 2. Technologies
+## Como foi feito
 
-| Technology | Purpose |
-|---|---|
-| **Python** | Main development language |
-| **OpenCV** | Image processing and feature detection |
-| **PyTorch** | Neural network implementation and training |
-| **MiDaS** | Pre-trained model for depth estimation |
-| **Trimesh** | 3D mesh generation and manipulation |
-| **Open3D** | 3D data visualization and processing |
-| **Blender** | 3D model visualization and editing |
+O projeto começou pelo básico, gerando formas simples em 3D, e foi ganhando etapas até chegar ao caminho completo da foto ao modelo.
 
----
+<details>
+<summary><b>O caminho da foto ao modelo 3D</b></summary>
 
-## 3. Input Image Guidelines
+- **Preparo da imagem:** a foto é reduzida para 256 x 256 pixels e normalizada.
+- **Remoção do fundo:** a biblioteca rembg separa o objeto principal e deixa o fundo transparente.
+- **Mapa de profundidade:** o MiDaS (versão `MiDaS_small`, carregada pelo PyTorch Hub) recebe a imagem em 384 x 384 e devolve um valor de profundidade para cada pixel.
+- **Malha 3D:** cada pixel do mapa vira um vértice, com a profundidade como altura, e cada quadrado de quatro vértices vira dois triângulos. O resultado é gravado em `.obj`.
+- **Visualização:** a malha é desenhada em 3D com o Matplotlib.
+- **Interface:** feita em Tkinter, com botão para carregar a imagem, botão para gerar, tela de carregamento por cima e o processamento numa thread separada para a janela não travar.
 
-To get the best results, the input image matters as much as the model. Follow these recommendations:
+</details>
 
-**Recommended:**
+<details>
+<summary><b>Visão computacional</b></summary>
 
-- A single object per image
-- Standard front view of the object
-- White, monochrome or removed background
+- **Primeiros passos com o OpenCV:** carregar, exibir, redimensionar, passar para escala de cinza e aplicar filtros.
+- **Detecção de contornos:** limiarização da imagem em preto e branco e busca dos contornos, desenhados por cima da foto original.
+- **Remoção de fundo sem IA:** bordas pelo detector de Canny, escolha do maior contorno e uma máscara binária (objeto em branco, fundo em preto) aplicada sobre a imagem.
+- **Formas básicas em 3D:** cubo, esfera, cilindro, pirâmide, plano e objetos montados a partir delas, como um pirulito e um garfo, gerados com o Trimesh e exportados em `.obj` para conferir no Blender.
+- **Nuvem de pontos:** o mapa de profundidade, gerado também com o MiDaS `DPT_Large`, vira uma nuvem de pontos no Open3D, salva em `.ply`.
 
-**Not recommended:**
+</details>
 
-- Text on the image
-- Multiple objects in one image
-- Complex or cluttered background
-- Inappropriate imagery, including harmful, offensive or NSFW content
+<details>
+<summary><b>Modelo de inteligência artificial</b></summary>
 
----
+- **Primeiro contato com treino:** uma rede convolucional em TensorFlow treinada para reconhecer dígitos escritos à mão (MNIST), para entender o ciclo de montar, treinar e salvar um modelo.
+- **Da imagem para o volume:** um autoencoder em PyTorch que recebe uma imagem de 64 x 64 pixels, comprime em 1024 valores e expande de volta, com convoluções 3D, até uma grade de voxels (pequenos cubos que ocupam ou não cada posição do espaço).
+- **Treino:** erro quadrático médio entre a grade gerada e a esperada, com o otimizador Adam.
 
-## 4. Results
+</details>
 
-### 4.1 Basic 3D Models
+<details>
+<summary><b>Que tipo de imagem funciona melhor</b></summary>
 
-**Cube:**
-![Cube](resultados/cubo.png)
+Uma única imagem não carrega toda a informação de profundidade e forma do objeto, então a foto de entrada pesa tanto quanto o modelo.
 
-**Sphere:**
-![Sphere](resultados/esfera.png)
+- **Funciona melhor:** um objeto só, visto de frente, com fundo branco, de uma cor só ou já removido.
+- **Atrapalha:** texto na imagem, vários objetos juntos e fundo cheio de detalhes.
 
-### 4.2 Depth Estimation
+</details>
 
-**Depth Map:**
-![Depth Map](resultados/mapa_profundidade.png)
+## Tecnologias
 
-### 4.3 Generated 3D Meshes
-
-**3D mesh from a 2D image:**
-![3D Mesh](resultados/malha_3d.png)
-
-### 4.4 Complex Models
-
-**Reconstruction of complex objects:**
-![Complex Object](resultados/objeto_complexo.png)
-
----
-
-## 5. How to Run
-
-1. Clone the repository:
-
-```sh
-git clone https://github.com/guavovic/3d-reconstruction-from-2d-images.git
-cd 3d-reconstruction-from-2d-images
-```
-
-2. Create and activate a virtual environment:
-
-```sh
-virtualenv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
-```
-
-3. Install the dependencies:
-
-```sh
-pip install -r requirements.txt
-```
-
-4. Run the scripts:
-
-```sh
-python scripts/passo_1/processamento_imagens.py
-```
+- **Linguagem:** Python.
+- **Inteligência artificial:** PyTorch e torchvision com o MiDaS, e TensorFlow nos primeiros testes.
+- **Imagem:** OpenCV, Pillow e rembg.
+- **3D:** Trimesh, Open3D e Matplotlib, com o Blender para conferir os modelos.
+- **Interface:** Tkinter.
 
 ---
 
-## 6. Project Structure
-
-```text
-TCC-PROJECT/
-├── dados/           # Input images and 3D models
-├── scripts/         # Python scripts for each stage of the project
-├── resultados/      # Generated results (images, 3D models, etc.)
-├── README.md        # This file
-└── requirements.txt # Project dependencies
-```
-
----
-
-## 7. Next Steps
-
-- Add support for multiple images (photogrammetry)
-- Build a graphical interface using Tkinter or Streamlit
-- Explore more advanced techniques such as NeRF (Neural Radiance Fields)
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+<sub>Licença [MIT](LICENSE) · Feito por [Gustavo Victor](https://github.com/guavovic)</sub>
