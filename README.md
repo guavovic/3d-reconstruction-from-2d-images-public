@@ -2,9 +2,6 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/guavovic/3d-reconstruction-from-2d-images-public?style=flat-square&label=licen%C3%A7a&color=2ea043" alt="Licença"></a>
-  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch">
-  <img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white" alt="OpenCV">
 </p>
 
 <p align="center">Ferramenta do meu TCC que transforma uma foto comum em um modelo 3D. Ela tira o fundo da imagem, estima a profundidade de cada pixel com inteligência artificial e monta a malha 3D a partir disso, pronta para abrir no Blender.</p>
